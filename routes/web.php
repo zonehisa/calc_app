@@ -7,4 +7,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/calcs/{number1}/{calclation}/{number2}', [CalcController::class, 'result']);
+Route::get('/calcs', [CalcController::class, 'showForm']);
+Route::post('/calcs', [CalcController::class, 'calculate']);

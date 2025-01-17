@@ -2,28 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CalculatorService;
+use Illuminate\Http\Request;
+
 class CalcController extends Controller
 {
-    public function result($number1, $calclation, $number2)
+    protected $calculatorService;
+
+    public function __construct(CalculatorService $calculatorService)
     {
-        $result = 0;
-        switch ($calclation) {
-            case 'addition':
-                $result = $number1 + $number2;
-                break;
-            case 'subtraction':
-                $result = $number1 - $number2;
-                break;
-            case 'multiplication':
-                $result = $number1 * $number2;
-                break;
-            case 'division':
-                $result = $number2 != 0 ? $number1 / $number2 : '0で割ろうとしていませんか？そんなことはやめましょうよ。考え直してください。';
-                break;
-            default:
-                $result = '正しい計算方法を入れてくださいよ~。';
-                break;
-        }
-        return view('calc', ['result' => $result]);
+        $this->calculatorService = $calculatorService;
+    }
+
+    public function showForm()
+    {
+        return view('calc');
+    }
+
+    public function calculate(Request $request)
+    {
+        $request->validate([
+            'number1' => 'required|numeric',
+            'number2' => 'required|numeric',
+            'calculation' => 'required|in:addition,subtraction,multiplication,division',
+        ]);
+
+        $number1 = $request->input('number1');
+        $calculation = $request->input('calculation');
+        $number2 = $request->input('number2');
+
+        $result = $this->calculatorService->calculate($number1, $calculation, $number2);
+
+        return response()->json(['result' => $result]);
     }
 }
